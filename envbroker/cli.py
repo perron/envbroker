@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 NAME_RE = re.compile(r"^[A-Z][A-Z0-9_]*$")
 # There is no `get` or `print` command on purpose.
@@ -104,7 +104,7 @@ def cmd_run(store_path: Path, names: list[str], command: list[str]) -> int:
         validate_name(name)
         env[name] = data[name]
         values.append(data[name])
-    result = subprocess.run(command, env=env, capture_output=True, text=True)
+    result = subprocess.run(command, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
     # Never echo raw child output if it contains a secret; redact first.
     sys.stdout.write(redact(result.stdout, values))
     sys.stderr.write(redact(result.stderr, values))
@@ -152,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
                 command = command[1:]
             return cmd_run(store, list(args.names), command)
         return 1
-    except ValueError as exc:
+    except (ValueError, OSError, json.JSONDecodeError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 

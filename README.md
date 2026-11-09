@@ -10,8 +10,13 @@ Do not put API keys or PATs in MCP configs or chat logs. Point the agent at
 
 ## Install
 
+Python 3.10 or later.
+
+From a checkout:
+
 ```bash
-python3 -m pip install -e .
+python3 -m pip install .
+python3 -m pip install -e ".[dev]"  # optional, for tests
 ```
 
 ## 30-second example
@@ -37,3 +42,23 @@ shell profile, browser cookies, or other credential files.
 Motivated by public reports of coding agents swallowing live API keys from
 MCP configs and chat logs. Original CLI; no source was copied from any
 credential broker.
+
+## Limits
+
+- There is no `get` or `print` command. Names can be listed; values cannot.
+- The store is a mode-0600 JSON file (default `~/.envbroker/store.json`). A store with group or world bits set is refused.
+- `run` injects named secrets into a child environment and redacts those exact values from captured stdout and stderr. Redaction will not catch a secret written to a file, a socket, or a modified spelling.
+- `run` captures child output (it is not a TTY passthrough), so it is a poor fit for long-running interactive commands.
+- envbroker never reads your shell profile, browser cookies, or other credential files.
+
+From GitHub you can also install with:
+
+```bash
+python3 -m pip install git+https://github.com/perron/envbroker.git
+```
+
+This package is not published to PyPI.
+
+## License
+
+MIT. See `LICENSE`. Please read `SECURITY.md` before filing a vulnerability report.
